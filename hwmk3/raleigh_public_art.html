@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Raleigh Public art</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <script src="./art.js" ></script>
+</head>
+<body>
+Raleigh Public Art
+<div id="mapid"></div>
+    
+    <style>
+        #mapid{ width: 900px; height: 500px; }
+    </style>
+    
+<script>
+    var map = L.map('mapid').setView([35.815, -78.66], 11.5);
+
+   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+    var Esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
+
+let size= 10
+let Year= 2010
+     function circleIcon (Year){
+         var geojsonMarkerOptions = {
+         radius: size,
+         fillColor: artcolor(Year),
+         color: artcolor(Year),
+        weight: 1,
+         opacity: 1,
+         fillOpacity: 0.8
+         };
+         return geojsonMarkerOptions;
+     }
+
+
+ function artclass(Classification) {
+                if (Classification == "Mural") {return "Mural"}
+                else if (Classification == "Integrated") {return "Integrated"}
+                else if (Classification == "Sculpture") {return "Sculpture"}
+                else if (Classification == "Installation") {return "Installation"}
+                else {return "NA"}
+                
+        }
+        var n = 0;
+    var mygeojson= L.geoJSON(publicart, {
+    pointToLayer: function (feature, latlng) {
+        var size = feature.properties.Year
+        return L.circleMarker(latlng, circleIcon(size)).bindPopup(artclass(feature.properties.Classification));
+    }
+        }).addTo(map); 
+
+
+        function artcolor(Year){
+        if (Year >= 2015) {return 'darkred'}
+        if (Year >= 2005) {return 'red'} 
+        else {return 'lightcoral'}
+   }
+
+var baseMaps = {
+    "OpenStreetMap": osm,
+    "Esri_worldimagery": Esri
+};
+
+var overlayMaps = {
+    "Art": mygeojson
+};
+
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+osm.addTo(map)
+mygeojson.addTo(map)
+        
+</script>
+
+This map shows the locations of Raleigh Public Art that are part of the permanent collection and are currently displayed. 
+
+The darker the circle, the more recent the art work was created.
+
+When clicking on the points, the classification of the artwork (Mural, Integration, Sculpture, Installation, or NA) appear.
+
+Data is from the city of Raleigh Open Data Site. 
+</body>
+</html>

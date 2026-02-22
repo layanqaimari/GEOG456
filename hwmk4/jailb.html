@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+
+    table {
+  font-family: Tahoma, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: 8px; 
+  overflow: hidden; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 10px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.increase {
+  background-color: yellow;
+}
+.decrease {
+  background-color: gray;
+}
+</style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table</title>
+    <script src="./data.js"></script>
+</head>
+<body>
+<h2 style="font-family: 'Verdana', sans-serif; color: #012a46;" >South Carolina Average Jail Incarceration Rate per county 1999-2019</h2>
+<h4 style="font-family: 'Verdana', sans-serif; color: #1f5a81;">The average jail rate is calculated by the jail population over the total male population aged 15-64 multiplied by 1,000. Counties that have an increase in Jail Incarceration from one decade to the next are highlighted in yellow, while counties that decrase jail incarceration are highlighted in gray</h4>
+
+
+<table id="mytable">
+      <tr> 
+    <th>County Name</th>
+    <th>Average Jail Incarceration Rate 1999-2008</th>
+    <th>Average Jail Incarceration Rate 2009-2019</th>
+  </tr>
+  
+</table>
+
+<script>
+    var x= document.getElementById('mytable')
+
+    console.log(data)
+
+    for (var i =0; i <data.features.length; i++){
+        var myNewRow= document.createElement('tr'); 
+        var myNewCell1 = document.createElement('td');
+        var myNewCell2 = document.createElement('td'); 
+        var myNewCell3 = document.createElement('td');
+
+        myNewCell1.innerHTML = data.features[i].properties.name;
+        myNewCell2.innerHTML = data.features[i].properties.jail_19992008;
+        myNewCell3.innerHTML = data.features[i].properties.jail_20092019;
+
+        var s= (data.features[i].properties.jail_19992008) - (data.features[i].properties.jail_20092019)
+        myNewRow.style.backgroundColor=  getBackgroundColor(s)
+
+        myNewRow.append(myNewCell1);
+        myNewRow.append(myNewCell2);
+        myNewRow.append(myNewCell3);
+        x.append(myNewRow);
+    }
+
+  function checkType(value) {
+    if (typeof value === "string") {
+        return "String";
+    } else if (typeof value === "number") {
+        return "Number";
+    } else {
+        return "Other";
+    }
+}
+
+
+ function getBackgroundColor(d) {
+  return d > 0 ? 'gray' : 'yellow'; }
+
+
+</script>
+</body>
+</html>

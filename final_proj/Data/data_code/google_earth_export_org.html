@@ -1,0 +1,124 @@
+/**
+ * Function to mask clouds using the Sentinel-2 QA band
+ * @param {ee.Image} image Sentinel-2 image
+ * @return {ee.Image} cloud masked Sentinel-2 image
+ */
+function maskS2clouds(image) {
+  var qa = image.select('QA60');
+
+  // Bits 10 and 11 are clouds and cirrus, respectively.
+  var cloudBitMask = 1 << 10;
+  var cirrusBitMask = 1 << 11;
+
+  // Both flags should be set to zero, indicating clear conditions.
+  var mask = qa.bitwiseAnd(cloudBitMask).eq(0)
+      .and(qa.bitwiseAnd(cirrusBitMask).eq(0));
+
+  return image.updateMask(image.neq(0)).divide(10000);
+}
+
+
+var yearBefore = '2023'
+var yearAfter = '2025'
+
+// var dataset = ee.ImageCollection('USDA/NAIP/DOQQ')
+//                   .filter(ee.Filter.date('2017-01-01', '2018-12-31'));
+
+var datasetBefore = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+                  .filter(ee.Filter.bounds(geometry))
+                  .filter(ee.Filter.date(yearBefore +'-09-01', yearBefore+'-09-15'))
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE',20))
+                  .map(maskS2clouds);
+
+var datasetAfter = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+                  .filter(ee.Filter.bounds(geometry2))
+                  .filter(ee.Filter.date(yearAfter +'-09-01', yearAfter+'-09-15'))
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE',20))
+                  .map(maskS2clouds);
+
+
+// var trueColor = dataset.select(['B4', 'B3', 'B2']);
+var befImg = datasetBefore.select(['B4', 'B3', 'B2'])
+befImg = befImg.median().clip(geometry2);
+
+var aftImg = datasetAfter.select(['B4', 'B3', 'B2'])
+aftImg = aftImg.median().clip(geometry2);
+
+var visualization = {
+  min: 0.0,
+  max: 0.3,
+  bands: ['B4', 'B3', 'B2'],
+};
+
+
+//histogram code
+
+
+var lookup = function(sourceHist, targetHist) {
+  // Split the histograms by column and normalize the counts.
+  var sourceValues = sourceHist.slice(1, 0, 1).project([0])
+  var sourceCounts = sourceHist.slice(1, 1, 2).project([0])
+  sourceCounts = sourceCounts.divide(sourceCounts.get([-1]))
+
+  var targetValues = targetHist.slice(1, 0, 1).project([0])
+  var targetCounts = targetHist.slice(1, 1, 2).project([0])
+  targetCounts = targetCounts.divide(targetCounts.get([-1]))
+
+  // Find first position in target where targetCount >= srcCount[i], for each i.
+  var lookup = sourceCounts.toList().map(function(n) {
+    var index = targetCounts.gte(n).argmax()
+    return targetValues.get(index)
+  })
+  return {x: sourceValues.toList(), y: lookup}
+}
+
+// Make the histogram of sourceImg match targetImg.
+var histogramMatch = function(sourceImg, targetImg) {
+  var geom = sourceImg.geometry()
+  var args = {
+    reducer: ee.Reducer.autoHistogram({maxBuckets: 256, cumulative: true}), 
+    geometry: geom,
+    scale: 30, // Need to specify a scale, but it doesn't matter what it is because bestEffort is true.
+    maxPixels: 65536 * 4 - 1,
+    bestEffort: true
+  }
+  
+  // Only use pixels in target that have a value in source
+  // (inside the footprint and unmasked).
+  var source = sourceImg.reduceRegion(args)
+  var target = targetImg.updateMask(sourceImg.mask()).reduceRegion(args)
+
+  return ee.Image.cat(
+    sourceImg.select(['B4'])
+      .interpolate(lookup(source.getArray('B4'), target.getArray('B4'))),
+    sourceImg.select(['B3'])
+      .interpolate(lookup(source.getArray('B3'), target.getArray('B3'))),
+    sourceImg.select(['B2'])
+      .interpolate(lookup(source.getArray('B2'), target.getArray('B2')))
+  )
+}
+
+
+var result = histogramMatch(befImg,aftImg)
+
+
+
+
+Map.setCenter(34.45047, 31.48921, 12); 
+Map.addLayer(aftImg, visualization, yearAfter);
+Map.addLayer(befImg, visualization, yearBefore);
+Map.addLayer(result, visualization, 'gaza' + yearBefore);
+
+Export.image.toDrive({
+  image: aftImg,
+  description: 'gaza'+ yearAfter,
+  scale: 1.1,
+  region: geometry2
+})
+
+Export.image.toDrive({
+  image: result,
+  description: 'gaza'+yearBefore ,
+  scale: 1.1,
+  region: geometry2
+})

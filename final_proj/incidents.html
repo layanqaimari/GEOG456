@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidents in Gaza</title>
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+        
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <script src="./Data/incidents_month_js/oct2023.js"></script>
+    <script src="./Data/incidents_month_js/nov2023.js"></script>
+    <script src="./Data/incidents_month_js/dec2023.js"></script>
+    <script src="./Data/incidents_month_js/jan2024.js"></script>
+    <script src="./Data/incidents_month_js/feb2024.js"></script>
+    <script src="./Data/incidents_month_js/march2024.js"></script>
+    <script src="./Data/incidents_month_js/april2024.js"></script>
+    <script src="./Data/incidents_month_js/may2024.js"></script>
+    <script src="./Data/incidents_month_js/june2024.js"></script>
+    <script src="./Data/incidents_month_js/july2024.js"></script>
+    <script src="./Data/incidents_month_js/aug2024.js"></script>
+    <script src="./Data/incidents_month_js/sep2024.js"></script>
+    <script src="./Data/incidents_month_js/oct2024.js"></script>
+    <script src="./Data/incidents_month_js/nov2024.js"></script>
+    <script src="./Data/incidents_month_js/dec2024.js"></script>
+    <script src="./Data/incidents_month_js/jan2025.js"></script>
+    <script src="./Data/incidents_month_js/feb2025.js"></script>
+    <script src="./Data/incidents_month_js/march2025.js"></script>
+    <script src="./Data/attacks/attack_aid .js"></script>
+     <script src="./Data/attacks/journalists.js"></script>
+    <script src="./Data/attacks/medical_personal.js"></script>
+
+
+
+
+
+
+   </head>
+
+<body>
+</br>
+<h2 id="theMonthH3elementID"> Month </h3>
+<input id="myRange" type="range" name="month" value="0" min="0" max="18"  oninput="moveSlider(this.value)">
+<br>
+<h3>
+Inidents that occured in Gaza from October 2023
+These include all attacks by the Israeli Military on civilians   </h3>  
+     <div id="container">
+        <div id="map">
+            <div id="legend" class="legend">
+                <h4>Legend</h4>
+            </div>
+        </div>
+        <div id="info">
+             <h3>Information Panel</h3>
+             <p>Hover over features on the map for details.</p>
+    
+            <p>
+                <span style="font-weight: bold; color: #000;">&#9679;</span> Each black dot represents a RECORDED incident.
+            </p>
+    
+            <div id="neighborhood-stats">
+                </div>
+    
+        
+        </div>
+    </div>
+
+    <style>
+         /* Container for the map and information panel */
+    body{
+        background-color: black; 
+    }
+     #container {
+        display: flex;
+        width: 100%;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    #map {
+        height: 700px;
+        width: 75%;
+        position: relative;
+    }
+
+h2{
+    color: white;
+
+}
+h3{
+    color: white;
+
+}
+    /* Styles for the information panel f */
+    #info {
+        border-left: 1px solid #c0c0c0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 25%;
+        background-color: #f8f8f8;
+        overflow-y: auto;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+     #info h3 {
+         margin-top: 0;
+         margin-bottom: 15px;
+         font-size: 18px;
+         color: #333;
+         border-bottom: 1px solid #eee;
+         padding-bottom: 10px;
+     }
+      #info p {
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 8px 0;
+          color: #555;
+      }
+
+    #neighborhood-stats {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #ccc;
+    }
+
+    #neighborhood-stats h4 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 16px;
+        color: #000;
+    }
+
+    #neighborhood-stats h5 {
+        margin-top: 15px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px dotted #ddd;
+        padding-bottom: 4px;
+    }
+
+    #neighborhood-stats p {
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 6px 0;
+        color: #444;
+    }
+    </style>
+     
+<script>
+ 
+    var map = L.map('map').setView([31.41921, 34.45047], 11);
+        
+    var voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+	subdomains: 'abcd',
+	maxZoom: 20
+});
+
+     var Esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+}).addTo(map);
+
+    var myStyle = {
+    "color": "#ff7800",
+    "weight": 0.25,
+    "opacity": 0.65
+};
+
+
+
+     var myData = [oct2023, nov2023, dec2023, jan2024, feb2024, march2024, april2024, may2024, june2024, july2024, aug2024, sep2024, oct2024, nov2024, dec2024, jan2025, feb2025, march2025] // array ordering the data. You need to be very careful with this method as you are bringing in all the data at once. different polygons
+     var order = ['October 2023','November 2023','Decmeber 2023', 'January 2024', 'February 2024', 'March 2024', 'April 2024', 'May 2024', 'June 2024', 'July 2024', 'August 2024', 'September 2024', 'October 2024', 'November 2024', 'December 2024', 'January 2025', 'February 2025'] // an array with the date of each data source
+
+    
+     
+     function circleMarker1(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: 3,
+        weight: 0.5,
+        opacity: 0.8,
+       
+        fillOpacity: 0.8,
+        color: "black"
+    })
+    //with the help of AI
+.on("click", function () {
+  showEventTypeInPanel(feature);
+});
+
+}
+;
+
+function circleMarker2(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: 3,
+        weight: 0.5,
+        opacity: 0.8,
+       
+        fillOpacity: 0.8,
+        color: "red"
+    })
+    //with the help of AI
+.on("click", function () {
+  showEventInfoInPanel(feature);
+});
+
+}
+;
+
+function circleMarker3(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: 3,
+        weight: 0.5,
+        opacity: 0.8,
+       
+        fillOpacity: 0.8,
+        color: "darkgreen"
+    })
+    //with the help of AI
+.on("click", function () {
+  showEventInfoInPanel(feature);
+});
+
+}
+;
+
+function circleMarker4(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: 3,
+        weight: 0.5,
+        opacity: 0.8,
+       
+        fillOpacity: 0.8,
+        color: "purple"
+    })
+    //with the help of AI
+.on("click", function () {
+  showEventInfoInPanel(feature);
+});
+
+}
+;
+
+  var incidents = L.geoJSON(myData[0], {
+      pointToLayer: circleMarker1
+  }).addTo(map);
+
+    var journalist_data = L.geoJSON(journalists, {
+      pointToLayer: circleMarker2
+  }).addTo(map);
+
+   var aidattacks_data = L.geoJSON(aid, {
+      pointToLayer: circleMarker3
+  }).addTo(map);
+
+   var medattacks_data = L.geoJSON(medical, {
+      pointToLayer: circleMarker4
+  }).addTo(map);
+
+
+
+const panel = document.getElementById("neighborhood-stats");
+  const panelcontent = document.getElementById("neighborhood-stats h4")   
+
+
+
+
+    function moveSlider(value){  // function called by the slider, with the value parameter: the value goes from 0 to 4
+        var month = myData[value] // get the data based on the slider value
+        incidents = L.geoJSON(month, {pointToLayer: circleMarker1}); //funtion which is all circle markers
+         map.addLayer(incidents); // add the new layer
+        document.getElementById('theMonthH3elementID').innerHTML = order[value] // change the text above the slider
+    }
+    moveSlider(0)
+
+ 
+     function getEventType (sub_event_type) {
+                if (sub_event_type == "Air/drone strike") {return "Air/drone strike"}
+                else if (sub_event_type == "Attack") {return "Attack"}
+                else if (sub_event_type == "Armed clash") {return "Armed clash"}
+                else if (sub_event_type == "Abduction/forced disappereance") {return "Abduction/forced disappereance"}
+                else if (sub_event_type == "Shelling/artillery/missile attack") {return "Shelling/artillery/missile attack"}
+                else if (sub_event_type == "Sexual Violence") {return "Sexual Violence"}
+                else {return "NA"} 
+     }
+
+
+//   let value = dateTime.getMonth(myData);
+//       function getEventColor(month){
+//         if (month == value) {return 'black'}
+//           else {return 'gray'}
+//      }
+
+
+function getlink(feature) {
+    const link = feature.properties.Link;
+
+    if (!link || link.trim() === "") {
+        return "No link available";
+    }
+
+    return link;
+}
+
+
+function getdate(feature) {
+    const date = feature.properties.display_date;
+
+    if (!date || date.trim() === "") {
+        return "No Date available";
+    }
+
+    return date;
+}
+
+function gettags(feature) {
+    const tag = feature.properties.Tags;
+
+    if (!tag || tag.trim() === "") {
+        return "No Event Type available";
+    }
+
+    return tag;
+}
+
+function showEventInfoInPanel(feature) {
+    panel.innerHTML = `
+        <h4>Date of Incident</h4>
+        <p>${getdate(feature)}</p>
+        <h4>Event Type</h4>
+        <p>${gettags(feature)}</p>
+        <h4>Media Link</h4>
+        <p>${getlink(feature)}</p>
+    `;
+}
+
+
+//with the help of AI
+function getNotes(feature) {
+    const notes = feature.properties.notes;
+
+    if (!notes || notes.trim() === "") {
+        return "No notes available";
+    }
+
+    return notes;
+}
+//with the help of AI
+function showEventTypeInPanel(feature) {
+    panel.innerHTML = `
+        <h4>Event Type</h4>
+        <p>${getEventType(feature.properties.sub_event_type)}</p>
+        <h5>Notes</h5>
+        <p>${getNotes(feature)}</p>
+    `;
+}
+
+     
+   var n = 0;
+
+
+ const neighborhoodStatsDiv = document.getElementById('neighborhood-stats');
+
+
+
+
+
+    
+    function myStyle(feature) {
+            return {
+            "fillColor": getColor(feature.properties[selectedYear]),
+            "color": "black",// notice that the selected year is the name of a property of the geojson
+            "weight": 0.75,
+            "opacity": 2.0,
+            "fillOpacity": 0.7
+            }
+        };
+
+
+
+var baseMaps = {
+    "Esri World Imagery": Esri,
+    "CartoDB Voyager": voyager
+};
+var overlayMaps = {
+    "Incidents": incidents, 
+    "Journalist Attacks": journalist_data, 
+    "Attacks on Aid" : aidattacks_data, 
+    "Attacks on Medical Personal": medattacks_data
+};
+
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+</script>
+
+
+</body>
+</html>

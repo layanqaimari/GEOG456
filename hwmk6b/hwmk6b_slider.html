@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slider Change</title>
+</head>
+<style>
+    body{
+        background-color: black;
+        font-size:20px;
+        color:white
+    }
+    div#image_container{
+        top: 20%;
+        
+    }
+    img{
+        height:80%;
+        position: absolute;
+    }
+
+    #img2023{
+        z-index: 1;
+        opacity: 1;
+    }
+    #img2024{
+        z-index: 3;
+        opacity: 0.5;
+    }
+    
+    #img2025{
+        z-index: 6;
+        opacity: 0;
+    }
+
+datalist {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 400px;
+}
+
+option {
+  padding: 0;
+}
+
+input {
+  width: 400px;
+  margin: 0;
+}
+  .row {
+          /* width: 600px;  */
+          width: 95vw;
+          background-color: rgb(28, 28, 28); /* Just for demonstration */
+          padding: 20px;
+          border: 1px solid black;
+          display: flex;
+        }
+
+ 
+        .column {
+          flex: 45%;
+          padding: 10px;
+          height :70vw;
+          overflow: hidden; /* Prevent overflow */
+        }
+</style>
+<body>
+
+    <label for="year">Deir Al-balah </label><br />
+<input type="range" id="year" name="year" list="tickmarks" value="0" oninput="myFunction(this.value)"/>
+<datalist id="tickmarks">
+  <option value="0" label="2023"></option>
+  <option value="100" label="2025"></option>
+</datalist>
+
+<div class="row">
+<div id="column">
+        <img id="img2025"  src="./images/jabalia2025.png" alt="">
+        <img id="img2024"  src="./images/jabalia2024.png" alt="">
+        <img id="img2023"  src="./images/jabalia2023.png" alt="">
+
+    </div>
+    </div>
+
+<script>
+    function myFunction(e) {
+        console.log(e)
+        document.getElementById("img2025").style.opacity = e/100;
+    }
+    </script>
+<div class="row">
+        <div class="column">
+
+        <p>Jabalia, in the North of the Gaza Strip, was a heavily populated area that contained Palestine's largest refugee camp set up in 1948, after the Nakba </p>
+        <p>Jabalia and the Jabalia refugee camp in specfic, was heavily targetted in Israeli Agression. It was a focus point of Israeli military operations and resulted in massive destruction, death, and dispalcement. </p>
+        <p>In 2025, Jabalia continued to be destroyed and largely reduced to rubble. Israel continues to launch offensives and ground invasions on what remains of Jabalia.</p>
+</div>
+</div>
+</body>
+</html>
